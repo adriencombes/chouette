@@ -19,3 +19,6 @@ draft/
 
 # Environments
 .env
+
+# Dataset
+data/

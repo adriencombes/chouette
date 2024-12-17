@@ -1,15 +1,15 @@
+import data, model
 
+if __name__ == '__main__':
 
-# download train data
-# data.open_data(test_data=False)
-# make dataset
-# process train data
+    resnet_version = '50'
+    epochs = 25
 
-# make model
-# model.make_model(resnet_version, num_classes)
+    train_dataset, validation_dataset = data.open_data(test_data=False)
+    num_classes = len(train_dataset.class_names)
 
-# train model
-# model.train_model(model, dataset, epochs)
+    resnet_model = model.make_model(resnet_version, num_classes)
+    model.train_model(resnet_model, train_dataset, validation_dataset, epochs)
 
 # save model and params
 # model.save_model(model, params)

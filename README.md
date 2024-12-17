@@ -2,7 +2,8 @@
 
 To do
 
-- coder tout le bazar
+- packager
+  - variable d'environ
 - créer serveur mlflow dockerisé
 - tests
 - deployer mlflow surun VM pour livraison

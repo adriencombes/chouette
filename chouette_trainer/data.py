@@ -1,38 +1,100 @@
+### BUILD-IN IMPORTS ###
 
-def download_data(start_date, end_date):
+import glob
+import os
+import shutil
 
-    # fetch infos from API
-    # make directories
-    # download images
 
-    pass
+### EXTERNAL IMPORTS ###
+
+import requests
+from tensorflow.keras.utils import image_dataset_from_directory
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+
+
+### SETTINGS ###
+
+USERNAME = os.environ.get('CHOUETTE_USERNAME')
+PASSWORD = os.environ.get('CHOUETTE_PASSWORD')
+
+
+### FUNCTIONS ###
+
+def download_train_data(start_date, end_date):
+
+    def download_images(start_date, end_date, tag):
+
+        os.makedirs(f'data/train/{tag}', exist_ok=True)
+
+        params = {
+            'start_date': start_date,
+            'end_date': end_date,
+            'tag': tag
+            }
+
+        response = requests.get(
+            'https://api.staging.chouette.vision/api/jobs/get-images/',
+            auth=(USERNAME, PASSWORD),
+            params=params
+            )
+
+        url_list = [image['media'] for image in response.json()]
+        # attention parfois cette liste est vide (pas de clef 'media')
+
+        for url in url_list:
+            image = requests.get(url)
+            file_name = f'{url.split("/")[-1].split(".jpg")[0]}' + '.jpg'
+
+            with open(f'data/train/{tag}/{file_name}', 'wb') as file:
+                file.write(image.content)
+            print(f'{file_name} downloaded')
+
+    for tag in ['vine','grass','ground']:
+        download_images(start_date, end_date, tag)
 
 
 def open_data(test_data=False):
 
-    # download_data()
+    # data.clear_cache()
+    # download_train_data('2020-01-01', '2021-01-01')
 
-    # if not test_data:
-        # va chercher les données d'entraînement
+    if test_data: data_dir = 'data/test'
+    else: data_dir = 'data/train'
 
-    # load data (image_from_direcotry())
+    seed = 123
+    validation_split = 0.3
+    img_height = 128
+    img_width = 128
+    batch_size = 128
 
-    # process_data(dataset, params)
+    train_dataset = image_dataset_from_directory(
+        data_dir,
+        validation_split=validation_split,
+        subset="training",
+        seed=seed,
+        labels='inferred',
+        label_mode='categorical',
+        image_size=(img_height, img_width),
+        batch_size=batch_size
+    )
 
-    # return dataset
+    validation_dataset = image_dataset_from_directory(
+        data_dir,
+        validation_split=validation_split,
+        subset="validation",
+        seed=seed,
+        labels='inferred',
+        label_mode='categorical',
+        image_size=(img_height, img_width),
+        batch_size=batch_size
+    )
 
-    pass
-
-
-def process_data(dataset, params):
-
-    # return processed dataset
-
-    pass
+    return train_dataset, validation_dataset
 
 
 def clear_cache():
 
-    # delete directories
-
-    pass
+    for directory in glob.glob('data/train/*'):
+        if os.path.exists(directory):
+            shutil.rmtree(directory)
+            print(f'{directory} removed')
