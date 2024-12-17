@@ -5,6 +5,9 @@ import os
 
 #### EXTERNAL IMPORTS ###
 
+import mlflow
+from mlflow.tracking import MlflowClient
+
 from tensorflow.keras.applications import ResNet50
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.layers import Dense, GlobalAveragePooling2D
@@ -72,14 +75,33 @@ def train_model(model, train_dataset, val_dataset, epochs):
 
 def save_model(model, params):
 
-    # save model
+    mlflow.set_tracking_uri("http://localhost:5000") # TODO change to env variable
+    mlflow.set_experiment("chouette_training")
+
+    with mlflow.start_run():
+        mlflow.log_params(params) # TODO rajouter le log des metrics d'entrainement
+        mlflow.tensorflow.log_model(
+            model=model,
+            artifact_path="model",
+            registered_model_name="chouette_vision"
+        )
+
+    pass
+
+def evaluate_model(test_dataset):
+
+    mlflow.set_tracking_uri("http://localhost:5000") # TODO change to env variable
+    client = MlflowClient()
+    model_versions = client.get_latest_versions(name='chouette_vision') # TODO filtrer le meilleur modele
+    model_uri = model_versions[0].source
+
+    model = mlflow.tensorflow.load_model(model_uri=model_uri)
+
+    metrics = model.evaluate(test_dataset)
 
     pass
 
 
-def evaluate_model(model, dataset):
+if __name__ == '__main__':
 
-    # evaluate model
-    # return evaluation
-
-    pass
+    evaluate_model(None, None)

@@ -22,3 +22,6 @@ draft/
 
 # Dataset
 data/
+
+# Local MLflow
+mlflow/

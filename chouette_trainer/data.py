@@ -53,13 +53,15 @@ def download_train_data(start_date, end_date):
         download_images(start_date, end_date, tag)
 
 
-def open_data(test_data=False):
+def open_train_data():
 
+    # TODO y'a moyen de factoriser
+
+    # TODO reactiver ça
     # data.clear_cache()
     # download_train_data('2020-01-01', '2021-01-01')
 
-    if test_data: data_dir = 'data/test'
-    else: data_dir = 'data/train'
+    data_dir = 'data/train'
 
     seed = 123
     validation_split = 0.3
@@ -90,6 +92,22 @@ def open_data(test_data=False):
     )
 
     return train_dataset, validation_dataset
+
+def open_test_data(test_data=False):
+
+    data_dir = 'data/test'
+
+    img_height = 128
+    img_width = 128
+
+    test_dataset = image_dataset_from_directory(
+        data_dir,
+        labels='inferred',
+        label_mode='categorical',
+        image_size=(img_height, img_width),
+    )
+
+    return test_dataset
 
 
 def clear_cache():

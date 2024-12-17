@@ -1,0 +1,15 @@
+services:
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:latest  # Utilise l'image officielle MLflow
+    container_name: mlflow-server
+    ports:
+      - "5000:5000"  # Expose le port par défaut de MLflow
+    # environment:
+    #   - MLFLOW_BACKEND_STORE_URI=sqlite:///mlflow.db  # Utilisation de SQLite pour stocker les métadonnées
+    #   - MLFLOW_DEFAULT_ARTIFACT_ROOT=/mlflow/artifacts  # Chemin par défaut pour stocker les artefacts
+    # volumes:
+    #   - ./mlflow:/tmp/mlflow  # Monte un volume pour persister les artefacts et la base de données
+    command: >
+      mlflow server
+      --host 0.0.0.0
+      --port 5000
